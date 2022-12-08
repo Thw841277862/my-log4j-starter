@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" packages="org.apache.skywalking.apm.toolkit.log.log4j.v2.x">
+
+    <Properties>
+        <!-- ==============================================公共配置============================================== -->
+        <!-- 日志默认存放的位置 -->
+        <property name="basePath">logs</property>
+        <!--日志文件默认输出格式:日期 线程号 日志级别 类名.方法 - 日志信息并换行 -->
+        <property name="logPattern">%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] [%traceId] %level %C.%M - %m%n</property>
+        <!-- 日志默认切割的最小单位 -->
+        <property name="everyFileSize">50MB</property>
+        <!-- 日志默认同一文件夹下可以存放的数量 -->
+        <property name="everyFileMax">3</property>
+        <!-- 日志默认输出级别 -->
+        <property name="outputLogLevel">${sys:output.log.level:-Info}</property>
+
+        <!-- ============================================TRACE级别日志============================================ -->
+        <!-- DEBUG日志默认存放路径(TRACE级别日志) -->
+        <property name="traceFileName">${basePath}/trace.log</property>
+        <!-- DEBUG日志默认压缩路径,将超过指定文件大小的日志,自动存入按"年月"建立的文件夹下面并进行压缩,作为存档 -->
+        <property name="traceFilePattern">${basePath}/%d{yyyy-MM}/trace-%d{yyyy-MM-dd}-%i.log.gz</property>
+
+        <!-- ============================================DEBUG级别日志============================================ -->
+        <!-- DEBUG日志默认存放路径(DEBUG级别日志) -->
+        <property name="debugFileName">${basePath}/debug.log</property>
+        <!-- DEBUG日志默认压缩路径,将超过指定文件大小的日志,自动存入按"年月"建立的文件夹下面并进行压缩,作为存档 -->
+        <property name="debugFilePattern">${basePath}/%d{yyyy-MM}/debug-%d{yyyy-MM-dd}-%i.log.gz</property>
+
+        <!-- ============================================INFO级别日志============================================ -->
+        <!-- INFO日志默认存放路径(INFO级别日志) -->
+        <property name="infoFileName">${basePath}/info.log</property>
+        <!-- INFO日志默认压缩路径,将超过指定文件大小的日志,自动存入按"年月"建立的文件夹下面并进行压缩,作为存档 -->
+        <property name="infoFilePattern">${basePath}/%d{yyyy-MM}/info-%d{yyyy-MM-dd}-%i.log.gz</property>
+
+        <!-- ============================================WARN级别日志============================================ -->
+        <!-- WARN日志默认存放路径(WARN级别日志) -->
+        <property name="warnFileName">${basePath}/warn.log</property>
+        <!-- WARN日志默认压缩路径,将超过指定文件大小的日志,自动存入按"年月"建立的文件夹下面并进行压缩,作为存档 -->
+        <property name="warnFilePattern">${basePath}/%d{yyyy-MM}/warn-%d{yyyy-MM-dd}-%i.log.gz</property>
+
+        <!-- ============================================ERROR级别日志============================================ -->
+        <!-- ERROR日志默认存放路径(ERROR级别日志) -->
+        <property name="errorFileName">${basePath}/error.log</property>
+        <!-- ERROR日志默认压缩路径,将超过指定文件大小的日志,自动存入按"年月"建立的文件夹下面并进行压缩,作为存档 -->
+        <property name="errorFilePattern">${basePath}/%d{yyyy-MM}/error-%d{yyyy-MM-dd}-%i.log.gz</property>
+    </Properties>
+
+    <appenders>
+        <!-- =======================================用来定义输出到控制台的配置======================================= -->
+        <Console name="console" target="SYSTEM_OUT">
+            <ThresholdFilter level="${outputLogLevel}" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="${logPattern}"/>
+        </Console>
+
+        <!-- =======================================打印TRACE级别的日志到文件======================================= -->
+        <RollingFile name="traceFile" fileName="${traceFileName}" filePattern="${traceFilePattern}">
+            <PatternLayout pattern="${logPattern}"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="${everyFileSize}"/>
+            </Policies>
+            <DefaultRolloverStrategy max="${everyFileMax}"/>
+            <Filters>
+                <ThresholdFilter level="DEBUG" onMatch="DENY" onMismatch="NEUTRAL"/>
+                <ThresholdFilter level="TRACE" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+        </RollingFile>
+
+        <!-- =======================================打印DEBUG级别的日志到文件======================================= -->
+        <RollingFile name="debugFile" fileName="${debugFileName}" filePattern="${debugFilePattern}">
+            <PatternLayout pattern="${logPattern}"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="${everyFileSize}"/>
+            </Policies>
+            <DefaultRolloverStrategy max="${everyFileMax}"/>
+            <Filters>
+                <ThresholdFilter level="INFO" onMatch="DENY" onMismatch="NEUTRAL"/>
+                <ThresholdFilter level="DEBUG" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+        </RollingFile>
+
+        <!-- =======================================打印INFO级别的日志到文件======================================= -->
+        <RollingFile name="infoFile" fileName="${infoFileName}" filePattern="${infoFilePattern}">
+            <PatternLayout pattern="${logPattern}"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="${everyFileSize}"/>
+            </Policies>
+            <DefaultRolloverStrategy max="${everyFileMax}"/>
+            <Filters>
+                <ThresholdFilter level="WARN" onMatch="DENY" onMismatch="NEUTRAL"/>
+                <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+        </RollingFile>
+
+        <!-- =======================================打印WARN级别的日志到文件======================================= -->
+        <RollingFile name="warnFile" fileName="${warnFileName}" filePattern="${warnFilePattern}">
+            <PatternLayout pattern="${logPattern}"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="${everyFileSize}"/>
+            </Policies>
+            <DefaultRolloverStrategy max="${everyFileMax}"/>
+            <Filters>
+                <ThresholdFilter level="ERROR" onMatch="DENY" onMismatch="NEUTRAL"/>
+                <ThresholdFilter level="WARN" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+        </RollingFile>
+
+        <!-- =======================================打印ERROR级别的日志到文件======================================= -->
+        <RollingFile name="errorFile" fileName="${errorFileName}" filePattern="${errorFilePattern}">
+            <PatternLayout pattern="${logPattern}"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="${everyFileSize}"/>
+            </Policies>
+            <DefaultRolloverStrategy max="${everyFileMax}"/>
+            <Filters>
+                <ThresholdFilter level="FATAL" onMatch="DENY" onMismatch="NEUTRAL"/>
+                <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+        </RollingFile>
+
+        <!-- =======================================SkyWalking 日志上报======================================= -->
+        <GRPCLogClientAppender name="skyWalkingGrpcFile">
+            <PatternLayout pattern="${logPattern}"/>
+        </GRPCLogClientAppender>
+    </appenders>
+
+    <loggers>
+        <Logger name="com.alibaba.nacos.client" level="WARN"/>
+        <Logger name="com.ulisesbocchio.jasyptspringboot" level="WARN"/>
+        <Logger name="com.anji.captcha" level="WARN"/>
+
+        <root level="${outputLogLevel}">
+            <appender-ref ref="console"/>
+            <appender-ref ref="traceFile"/>
+            <appender-ref ref="debugFile"/>
+            <appender-ref ref="infoFile"/>
+            <appender-ref ref="warnFile"/>
+            <appender-ref ref="errorFile"/>
+            <appender-ref ref="skyWalkingGrpcFile"/>
+        </root>
+    </loggers>
+
+</Configuration>

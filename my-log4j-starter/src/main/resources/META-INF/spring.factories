@@ -1,0 +1,1 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=my.log4j.starter.Log4jAutoConfiguration
